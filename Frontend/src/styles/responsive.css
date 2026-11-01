@@ -443,6 +443,27 @@
   }
 }
 
+@media (max-width: 640px) {
+  .card {
+    padding: 1.35rem;
+  }
+
+  /* Full-width action buttons on small mobile screens */
+  .btn-primary, .btn-secondary {
+    width: 100%;
+  }
+
+  /* Form step navigation stacks cleanly on mobile */
+  form .flex.items-center.gap-3 {
+    width: 100%;
+    flex-direction: column-reverse;
+  }
+
+  form .flex.items-center.gap-3 button {
+    width: 100%;
+  }
+}
+
 @media (max-width: 480px) {
   h1 { font-size: 2rem; }
   h2 { font-size: 1.6rem; }

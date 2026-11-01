@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { Heart, ShieldAlert, ExternalLink, Award } from 'lucide-react';
 
 export const Footer = () => {
+  const currentYear = 2026;
+
   return (
     <footer className="footer no-print">
       <div className="container">
@@ -47,8 +49,8 @@ export const Footer = () => {
             <ul className="footer-links">
               <li><Link to="/">Home</Link></li>
               <li><Link to="/prediction">Check Risk Factors</Link></li>
-              <li><Link to="/health-insights">Learn About Diabetes</Link></li>
-              <li><Link to="/history">My Results</Link></li>
+              <li><Link to="/learn-about-diabetes">Learn About Diabetes</Link></li>
+              <li><Link to="/history">My Previous Results</Link></li>
               <li><Link to="/profile">My Profile</Link></li>
             </ul>
           </div>
@@ -92,7 +94,7 @@ export const Footer = () => {
 
         {/* Footer Bottom Bar */}
         <div className="footer-bottom">
-          <p>© {new Date().getFullYear()} Diabetes Risk Predictor. Academic Full-Stack Engineering Demonstration.</p>
+          <p>© {currentYear} Diabetes Risk Predictor. Academic Full-Stack Engineering Demonstration.</p>
           <div className="flex items-center gap-4">
             <span style={{ color: '#64748B' }}>Frontend: React 19 + Vite</span>
             <span>•</span>

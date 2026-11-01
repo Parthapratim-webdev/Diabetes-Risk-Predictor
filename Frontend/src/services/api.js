@@ -27,7 +27,7 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor: Uniform error handling & 401 session expiration handling
+// Response interceptor: Uniform user-friendly error handling
 api.interceptors.response.use(
   (response) => {
     return response;
@@ -35,9 +35,11 @@ api.interceptors.response.use(
   (error) => {
     // Handle network offline / server unreachable gracefully
     if (!error.response) {
-      console.warn('[API Integration] Backend server is not reachable at:', error.config?.baseURL);
+      if (import.meta.env.DEV) {
+        console.warn('[API Integration] Backend server is not reachable at:', error.config?.baseURL);
+      }
       return Promise.reject({
-        message: 'Unable to connect to the backend server. Running in demonstration mode.',
+        message: 'We could not connect to the service. Please check your internet connection and try again.',
         isNetworkError: true,
       });
     }
@@ -46,11 +48,27 @@ api.interceptors.response.use(
     if (error.response.status === 401) {
       sessionStorage.removeItem('drp_auth_token');
       sessionStorage.removeItem('drp_user_session');
+      return Promise.reject({
+        status: 401,
+        message: 'Your session has expired. Please log in again.',
+      });
+    }
+
+    // Friendly messages by HTTP status code
+    let friendlyMessage = 'Something went wrong on our side. Please try again later.';
+    const status = error.response.status;
+
+    if (status === 400 || status === 422) {
+      friendlyMessage = error.response.data?.message || 'Please check the highlighted fields and correct the information.';
+    } else if (status === 404) {
+      friendlyMessage = 'The requested information was not found.';
+    } else if (status >= 500) {
+      friendlyMessage = 'Something went wrong on our side. Please try again later.';
     }
 
     const customError = {
-      status: error.response.status,
-      message: error.response.data?.message || 'An unexpected server error occurred.',
+      status,
+      message: friendlyMessage,
       errors: error.response.data?.errors,
     };
 

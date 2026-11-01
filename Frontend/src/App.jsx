@@ -40,6 +40,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/health-insights" element={<HealthInsights />} />
+          <Route path="/learn-about-diabetes" element={<HealthInsights />} />
           <Route path="/about" element={<About />} />
 
           {/* Protected Dashboard Routes */}

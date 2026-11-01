@@ -77,6 +77,7 @@ export const calculateBMI = (heightCm, weightKg) => {
     badgeClass,
     description,
     healthyWeightRange: `${minHealthyWeight} - ${maxHealthyWeight} kg`,
-    disclaimer: 'Note: BMI is a general screening indicator and does not differentiate between muscle and fat mass, nor does it determine diabetes risk on its own.'
+    explanation: 'BMI is a calculation based on your height and weight. It is only one measure of health and cannot tell you whether you have diabetes.',
+    disclaimer: 'BMI is a calculation based on your height and weight. It is only one measure of health and cannot tell you whether you have diabetes.'
   };
 };

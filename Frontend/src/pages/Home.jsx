@@ -10,7 +10,6 @@ import {
   ChevronUp,
   Heart,
   Clock,
-  Sparkles,
 } from 'lucide-react';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
@@ -45,7 +44,7 @@ export const Home = () => {
       icon: BookOpen,
       title: 'Understand diabetes.',
       desc: 'Learn the basics of how insulin and blood sugar work, and what distinguishes prediabetes from type 2 diabetes.',
-      link: '/health-insights',
+      link: '/learn-about-diabetes',
     },
     {
       icon: Activity,
@@ -57,7 +56,7 @@ export const Home = () => {
       icon: Heart,
       title: 'Learn about healthy habits.',
       desc: 'Explore approachable ideas for balanced nutrition, physical activity, and sustainable daily wellness.',
-      link: '/health-insights',
+      link: '/learn-about-diabetes',
     },
     {
       icon: ShieldCheck,
@@ -182,7 +181,7 @@ export const Home = () => {
                     <span>Get Started</span>
                     <ArrowRight size={18} />
                   </Link>
-                  <Link to="/health-insights" className="btn btn-outline btn-lg">
+                  <Link to="/learn-about-diabetes" className="btn btn-outline btn-lg">
                     <span>Learn About Diabetes</span>
                   </Link>
                 </div>
@@ -462,7 +461,7 @@ export const Home = () => {
                   <ArrowRight size={18} />
                 </Link>
                 <Link
-                  to="/health-insights"
+                  to="/learn-about-diabetes"
                   className="btn btn-outline btn-lg"
                   style={{ color: '#FFFFFF', borderColor: 'rgba(255,255,255,0.4)' }}
                 >

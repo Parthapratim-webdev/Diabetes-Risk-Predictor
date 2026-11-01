@@ -6,7 +6,6 @@ import {
   History,
   Lightbulb,
   User,
-  Info,
   LogOut,
   ChevronLeft,
   ChevronRight,
@@ -27,8 +26,8 @@ export const Sidebar = ({ isCollapsed, onToggleCollapse, isMobileOpen, onCloseMo
   const menuItems = [
     { name: 'Home', path: '/', icon: Heart },
     { name: 'Check Risk Factors', path: '/prediction', icon: PlusCircle },
-    { name: 'Learn About Diabetes', path: '/health-insights', icon: Lightbulb },
-    { name: 'My Results', path: '/history', icon: History },
+    { name: 'Learn About Diabetes', path: '/learn-about-diabetes', icon: Lightbulb },
+    { name: 'My Previous Results', path: '/history', icon: History },
     { name: 'My Profile', path: '/profile', icon: User },
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
   ];

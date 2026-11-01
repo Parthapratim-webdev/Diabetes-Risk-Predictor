@@ -83,8 +83,8 @@ export const Navbar = () => {
   const mainNavItems = [
     { name: 'Home', path: '/' },
     { name: 'Check Risk Factors', path: '/prediction' },
-    { name: 'Learn About Diabetes', path: '/health-insights' },
-    { name: 'My Results', path: '/history' },
+    { name: 'Learn About Diabetes', path: '/learn-about-diabetes' },
+    { name: 'My Previous Results', path: '/history' },
     { name: 'My Profile', path: '/profile' },
   ];
 
@@ -185,7 +185,7 @@ export const Navbar = () => {
                     >
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', padding: '0.55rem 0.75rem', borderRadius: 'var(--radius-sm)', color: 'var(--color-text)', fontSize: '0.9rem' }}>
                         <History size={16} color="var(--color-primary)" />
-                        <span>My Results</span>
+                        <span>My Previous Results</span>
                       </div>
                     </Link>
 

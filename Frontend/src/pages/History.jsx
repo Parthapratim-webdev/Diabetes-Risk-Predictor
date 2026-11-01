@@ -1,22 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Search,
-  Filter,
   ArrowUpDown,
   Eye,
   Trash2,
-  Table as TableIcon,
-  Grid,
-  Info,
-  ChevronLeft,
-  ChevronRight,
-  PlusCircle,
+  Printer,
   Calendar,
+  PlusCircle,
+  Clock,
+  HelpCircle,
 } from 'lucide-react';
 import { predictionService } from '../services/predictionService';
 import { LoadingSpinner } from '../components/LoadingSpinner';
-import { EmptyState } from '../components/EmptyState';
 import { Modal } from '../components/Modal';
 import toast from 'react-hot-toast';
 
@@ -24,38 +20,54 @@ export const History = () => {
   const [assessments, setAssessments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedRiskFilter, setSelectedRiskFilter] = useState('ALL');
   const [sortOrder, setSortOrder] = useState('newest');
-  const [viewMode, setViewMode] = useState('table'); // 'table' or 'card'
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
 
-  // Pagination state
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
-
   const navigate = useNavigate();
 
-  const fetchRecords = async () => {
+  const fetchRecords = useCallback(async () => {
     setLoading(true);
     try {
       const response = await predictionService.getPredictionHistory({
         search: searchQuery,
-        riskLevel: selectedRiskFilter,
         sort: sortOrder,
       });
       setAssessments(response.data || []);
-      setCurrentPage(1);
     } catch {
-      toast.error('Failed to load your previous results.');
+      toast.error('Could not load your previous results.');
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchQuery, sortOrder]);
 
   useEffect(() => {
-    fetchRecords();
-  }, [searchQuery, selectedRiskFilter, sortOrder]);
+    let isMounted = true;
+    predictionService
+      .getPredictionHistory({
+        search: searchQuery,
+        sort: sortOrder,
+      })
+      .then((response) => {
+        if (isMounted) {
+          setAssessments(response.data || []);
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          toast.error('Could not load your previous results.');
+        }
+      })
+      .finally(() => {
+        if (isMounted) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [searchQuery, sortOrder]);
 
   const handleDeleteClick = (assessment) => {
     setItemToDelete(assessment);
@@ -75,21 +87,21 @@ export const History = () => {
     }
   };
 
-  // Pagination calculations
-  const totalPages = Math.ceil(assessments.length / itemsPerPage) || 1;
-  const paginatedItems = assessments.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const handlePrintRecord = (item) => {
+    navigate(`/result/${item.id}`, { state: { assessment: item } });
+    setTimeout(() => {
+      window.print();
+    }, 500);
+  };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-      {/* Header & Description */}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', maxWidth: '1000px', margin: '0 auto' }}>
+      {/* Header */}
       <div className="flex items-center justify-between" style={{ flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h2 style={{ fontSize: '1.5rem', margin: 0 }}>Your Previous Results</h2>
-          <p style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', marginTop: '0.2rem' }}>
-            Review, search, and inspect past biometric evaluations and risk indicator profiles.
+          <h1 style={{ fontSize: '1.85rem', margin: 0, color: 'var(--color-text)' }}>My Previous Results</h1>
+          <p style={{ fontSize: '0.95rem', color: 'var(--color-text-secondary)', marginTop: '0.35rem' }}>
+            Find your previous assessments, view their dates, print reports, or review details.
           </p>
         </div>
 
@@ -97,319 +109,258 @@ export const History = () => {
           type="button"
           className="btn btn-primary btn-sm"
           onClick={() => navigate('/prediction')}
+          style={{ minHeight: '44px' }}
         >
-          <PlusCircle size={16} />
-          <span>Check Your Risk Factors</span>
+          <PlusCircle size={18} aria-hidden="true" />
+          <span>New Assessment</span>
         </button>
       </div>
 
-      {/* Demonstration environment alert */}
-      <div className="alert-banner info" style={{ margin: 0 }}>
-        <Info size={18} style={{ flexShrink: 0, marginTop: '2px' }} />
-        <span style={{ fontSize: '0.85rem' }}>
-          Historical records are maintained for this active session. When the Node.js / Express backend is connected, 
-          these records sync securely with MongoDB collections via <code>GET /api/predictions</code>.
+      {/* Educational Notice Banner */}
+      <div className="alert-banner info" style={{ margin: 0 }} role="region" aria-label="Educational Notice">
+        <HelpCircle size={20} style={{ flexShrink: 0, marginTop: '2px', color: '#1D4ED8' }} aria-hidden="true" />
+        <span style={{ fontSize: '0.9rem', lineHeight: 1.5 }}>
+          Your assessment history is saved confidentially during your session. No sample records are shown as genuine medical information.
         </span>
       </div>
 
-      {/* Search, Filter & Controls Toolbar */}
-      <div
-        className="card"
-        style={{
-          padding: '1.25rem 1.5rem',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '1rem',
-          backgroundColor: '#FFFFFF',
-        }}
-      >
+      {/* Search and Sort Toolbar (Shown only if history exists or user is searching) */}
+      {(assessments.length > 0 || searchQuery) && (
         <div
+          className="card"
           style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-            gap: '1rem',
+            padding: '1.25rem 1.5rem',
+            display: 'flex',
             alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '1rem',
           }}
         >
           {/* Search Box */}
-          <div className="input-wrapper">
+          <div className="input-wrapper" style={{ maxWidth: '380px' }}>
             <div className="input-icon-left">
-              <Search size={18} />
+              <Search size={18} aria-hidden="true" />
             </div>
             <input
               type="text"
               className="form-input form-input-with-icon-left"
-              placeholder="Search by ID or Classification..."
+              style={{ minHeight: '44px', fontSize: '0.95rem' }}
+              placeholder="Search by assessment ID..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              aria-label="Search previous assessments by ID"
             />
           </div>
 
-          {/* Filter by Risk Level */}
-          <div className="input-wrapper">
-            <div className="input-icon-left">
-              <Filter size={18} />
-            </div>
-            <select
-              className="form-select form-input-with-icon-left"
-              value={selectedRiskFilter}
-              onChange={(e) => setSelectedRiskFilter(e.target.value)}
-            >
-              <option value="ALL">All Risk Indicator Levels</option>
-              <option value="Low">Low Risk Indicators</option>
-              <option value="Moderate">Moderate Indicators</option>
-              <option value="Elevated">Elevated Indicators</option>
-            </select>
-          </div>
-
           {/* Sort Order */}
-          <div className="input-wrapper">
+          <div className="input-wrapper" style={{ maxWidth: '240px' }}>
             <div className="input-icon-left">
-              <ArrowUpDown size={18} />
+              <ArrowUpDown size={18} aria-hidden="true" />
             </div>
             <select
               className="form-select form-input-with-icon-left"
+              style={{ minHeight: '44px', fontSize: '0.95rem' }}
               value={sortOrder}
               onChange={(e) => setSortOrder(e.target.value)}
+              aria-label="Sort assessments order"
             >
-              <option value="newest">Sort: Newest First</option>
-              <option value="oldest">Sort: Oldest First</option>
+              <option value="newest">Newest Assessments First</option>
+              <option value="oldest">Oldest Assessments First</option>
             </select>
           </div>
-
-          {/* View Toggle (Table / Card) */}
-          <div className="flex items-center justify-end gap-2">
-            <span style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginRight: '0.25rem' }}>
-              View:
-            </span>
-            <button
-              type="button"
-              className={`btn btn-sm ${viewMode === 'table' ? 'btn-primary' : 'btn-outline'}`}
-              onClick={() => setViewMode('table')}
-              aria-label="Table view"
-              title="Table view"
-            >
-              <TableIcon size={16} />
-            </button>
-            <button
-              type="button"
-              className={`btn btn-sm ${viewMode === 'card' ? 'btn-primary' : 'btn-outline'}`}
-              onClick={() => setViewMode('card')}
-              aria-label="Card grid view"
-              title="Card view"
-            >
-              <Grid size={16} />
-            </button>
-          </div>
         </div>
-      </div>
+      )}
 
-      {/* Main Content: Table or Cards */}
+      {/* Main Content Area */}
       {loading ? (
-        <LoadingSpinner size="lg" message="Loading records..." />
-      ) : assessments.length === 0 ? (
-        <div className="card">
-          <EmptyState
-            title="No Assessments Matching Filter"
-            description="No assessments matched your query. Try resetting your search or filter options, or create a new assessment."
-            actionText="Clear Filters"
-            onAction={() => {
-              setSearchQuery('');
-              setSelectedRiskFilter('ALL');
-            }}
-            secondaryActionText="New Assessment"
-            onSecondaryAction={() => navigate('/prediction')}
-          />
+        <div style={{ padding: '3rem 0' }}>
+          <LoadingSpinner size="lg" message="Loading your assessments..." />
         </div>
-      ) : viewMode === 'table' ? (
-        /* TABLE VIEW */
-        <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
-              <thead>
-                <tr style={{ backgroundColor: '#F8FAFC', borderBottom: '1px solid var(--color-border)', color: 'var(--color-text-secondary)', fontSize: '0.8rem', textTransform: 'uppercase' }}>
-                  <th style={{ padding: '0.9rem 1.25rem' }}>Assessment ID</th>
-                  <th style={{ padding: '0.9rem 1.25rem' }}>Date Evaluated</th>
-                  <th style={{ padding: '0.9rem 1.25rem' }}>Glucose</th>
-                  <th style={{ padding: '0.9rem 1.25rem' }}>Blood Pressure</th>
-                  <th style={{ padding: '0.9rem 1.25rem' }}>BMI</th>
-                  <th style={{ padding: '0.9rem 1.25rem' }}>Classification</th>
-                  <th style={{ padding: '0.9rem 1.25rem', textAlign: 'right' }}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {paginatedItems.map((item) => {
-                  const riskLevel = item.predictionResult?.riskLevel || 'Low';
-                  const badgeClass =
-                    riskLevel === 'Low'
-                      ? 'badge-success'
-                      : riskLevel === 'Moderate'
-                      ? 'badge-warning'
-                      : 'badge-danger';
-
-                  const dateFormatted = new Intl.DateTimeFormat('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric',
-                  }).format(new Date(item.createdAt));
-
-                  return (
-                    <tr
-                      key={item.id}
-                      style={{
-                        borderBottom: '1px solid var(--color-border-light)',
-                        transition: 'background-color var(--transition-fast)',
-                      }}
-                    >
-                      <td style={{ padding: '1rem 1.25rem', fontWeight: 600, color: 'var(--color-primary)' }}>
-                        {item.id}
-                      </td>
-                      <td style={{ padding: '1rem 1.25rem', color: 'var(--color-text-secondary)' }}>
-                        {dateFormatted}
-                      </td>
-                      <td style={{ padding: '1rem 1.25rem' }}>
-                        <strong>{item.measurements?.glucose || '--'}</strong> mg/dL
-                      </td>
-                      <td style={{ padding: '1rem 1.25rem' }}>
-                        {item.measurements?.systolicBP}/{item.measurements?.diastolicBP} mmHg
-                      </td>
-                      <td style={{ padding: '1rem 1.25rem' }}>
-                        <strong>{item.measurements?.bmi || '--'}</strong> kg/m²
-                      </td>
-                      <td style={{ padding: '1rem 1.25rem' }}>
-                        <span className={`badge ${badgeClass}`}>
-                          {item.predictionResult?.classification || 'Completed'}
-                        </span>
-                      </td>
-                      <td style={{ padding: '1rem 1.25rem', textAlign: 'right' }}>
-                        <div className="flex items-center justify-end gap-2">
-                          <button
-                            type="button"
-                            className="btn btn-outline btn-sm"
-                            onClick={() => navigate(`/result/${item.id}`, { state: { assessment: item } })}
-                            title="View Full Assessment"
-                          >
-                            <Eye size={14} />
-                            <span>Details</span>
-                          </button>
-                          <button
-                            type="button"
-                            className="btn btn-ghost btn-sm"
-                            onClick={() => handleDeleteClick(item)}
-                            style={{ color: 'var(--color-error)' }}
-                            title="Delete Record"
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+      ) : assessments.length === 0 ? (
+        /* Empty State required when no history exists */
+        <div className="card" style={{ padding: '3rem 1.5rem', textAlign: 'center' }}>
+          <div
+            style={{
+              width: '56px',
+              height: '56px',
+              borderRadius: '50%',
+              backgroundColor: 'var(--color-primary-light)',
+              color: 'var(--color-primary)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 1.25rem',
+            }}
+          >
+            <Clock size={28} aria-hidden="true" />
           </div>
+          <h2 style={{ fontSize: '1.35rem', fontWeight: 700, color: 'var(--color-text)', marginBottom: '0.5rem' }}>
+            {searchQuery ? 'No assessments found matching your search.' : "You haven't completed an assessment yet."}
+          </h2>
+          <p style={{ fontSize: '0.95rem', color: 'var(--color-text-secondary)', maxWidth: '440px', margin: '0 auto 1.5rem', lineHeight: 1.6 }}>
+            {searchQuery
+              ? 'Try clearing your search query to see all your saved assessments.'
+              : 'Complete your first step-by-step assessment to save your results here.'}
+          </p>
+
+          {searchQuery ? (
+            <button
+              type="button"
+              className="btn btn-outline"
+              onClick={() => setSearchQuery('')}
+            >
+              Clear Search
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="btn btn-primary"
+              style={{ minHeight: '48px', padding: '0.75rem 1.5rem', fontSize: '1rem' }}
+              onClick={() => navigate('/prediction')}
+            >
+              Start Your First Assessment
+            </button>
+          )}
         </div>
       ) : (
-        /* CARD GRID VIEW */
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))', gap: '1.25rem' }}>
-          {paginatedItems.map((item) => {
-            const riskLevel = item.predictionResult?.riskLevel || 'Low';
-            const badgeClass =
-              riskLevel === 'Low'
-                ? 'badge-success'
-                : riskLevel === 'Moderate'
-                ? 'badge-warning'
-                : 'badge-danger';
+        /* Simple responsive list / cards (clean on mobile and desktop) */
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          {assessments.map((item) => {
+            const dateFormatted = new Intl.DateTimeFormat('en-US', {
+              month: 'long',
+              day: 'numeric',
+              year: 'numeric',
+              hour: 'numeric',
+              minute: '2-digit',
+            }).format(new Date(item.createdAt));
+
+            const m = item.measurements || {};
+            const isEvaluated = Boolean(item.predictionResult);
 
             return (
-              <div key={item.id} className="card card-hover" style={{ display: 'flex', flexDirection: 'column' }}>
-                <div className="flex items-center justify-between" style={{ marginBottom: '0.75rem' }}>
-                  <span style={{ fontWeight: 700, color: 'var(--color-primary)', fontSize: '0.95rem' }}>
-                    {item.id}
-                  </span>
-                  <span className={`badge ${badgeClass}`}>
-                    {riskLevel}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-1" style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginBottom: '1rem' }}>
-                  <Calendar size={13} />
-                  <span>{new Date(item.createdAt).toLocaleDateString()}</span>
-                </div>
-
-                <div style={{ background: '#F8FAFC', padding: '0.85rem', borderRadius: 'var(--radius-md)', marginBottom: '1.25rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', fontSize: '0.85rem' }}>
+              <div
+                key={item.id}
+                className="card card-hover"
+                style={{
+                  padding: '1.5rem',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '1rem',
+                  borderLeft: '4px solid var(--color-primary)',
+                }}
+              >
+                {/* Header row: ID, Date, Status */}
+                <div className="flex items-center justify-between" style={{ flexWrap: 'wrap', gap: '0.75rem' }}>
                   <div>
-                    <span style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', display: 'block' }}>Glucose</span>
-                    <strong>{item.measurements?.glucose} mg/dL</strong>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-text-muted)' }}>
+                      ASSESSMENT ID
+                    </span>
+                    <div style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--color-primary)' }}>
+                      {item.id}
+                    </div>
                   </div>
+
+                  <div className="flex items-center gap-1.5" style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
+                    <Calendar size={14} aria-hidden="true" />
+                    <span>{dateFormatted}</span>
+                  </div>
+
+                  <div>
+                    {isEvaluated ? (
+                      <span className="badge badge-success">Evaluated</span>
+                    ) : (
+                      <span className="badge badge-neutral">Answers Recorded</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Information preview */}
+                <div
+                  style={{
+                    backgroundColor: '#F8FAFC',
+                    padding: '1rem',
+                    borderRadius: 'var(--radius-md)',
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+                    gap: '0.75rem',
+                    fontSize: '0.875rem',
+                  }}
+                >
+                  <div>
+                    <span style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', display: 'block' }}>Age</span>
+                    <strong>{m.age ? `${m.age} yrs` : '--'}</strong>
+                  </div>
+
+                  <div>
+                    <span style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', display: 'block' }}>Height & Weight</span>
+                    <strong>{m.heightCm ? `${m.heightCm} cm` : '--'} / {m.weightKg ? `${m.weightKg} kg` : '--'}</strong>
+                  </div>
+
                   <div>
                     <span style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', display: 'block' }}>BMI</span>
-                    <strong>{item.measurements?.bmi} kg/m²</strong>
+                    <strong>{m.bmi ? `${m.bmi} kg/m²` : '--'}</strong>
                   </div>
+
+                  <div>
+                    <span style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', display: 'block' }}>Fasting Glucose</span>
+                    <strong>{m.glucose ? `${m.glucose} ${m.glucoseUnit || 'mg/dL'}` : 'Not provided'}</strong>
+                  </div>
+
                   <div>
                     <span style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', display: 'block' }}>Blood Pressure</span>
-                    <strong>{item.measurements?.systolicBP}/{item.measurements?.diastolicBP}</strong>
-                  </div>
-                  <div>
-                    <span style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', display: 'block' }}>Family History</span>
-                    <strong>{item.measurements?.familyHistory ? 'Yes' : 'No'}</strong>
+                    <strong>{m.systolicBP ? `${m.systolicBP}/${m.diastolicBP || '--'} mmHg` : 'Not provided'}</strong>
                   </div>
                 </div>
 
-                <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', justifySelf: 'flex-end', justifyContent: 'space-between', borderTop: '1px solid var(--color-border-light)', paddingTop: '0.75rem' }}>
+                {/* Actions: Open Details, Print, Delete */}
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    gap: '0.75rem',
+                    borderTop: '1px solid var(--color-border-light)',
+                    paddingTop: '0.75rem',
+                  }}
+                >
                   <button
                     type="button"
                     className="btn btn-ghost btn-sm"
                     onClick={() => handleDeleteClick(item)}
                     style={{ color: 'var(--color-error)' }}
+                    aria-label={`Delete assessment record ${item.id}`}
                   >
-                    <Trash2 size={14} />
-                    <span>Delete</span>
+                    <Trash2 size={15} aria-hidden="true" />
+                    <span>Delete Record</span>
                   </button>
 
-                  <button
-                    type="button"
-                    className="btn btn-primary btn-sm"
-                    onClick={() => navigate(`/result/${item.id}`, { state: { assessment: item } })}
-                  >
-                    <Eye size={14} />
-                    <span>View Result</span>
-                  </button>
+                  <div className="flex items-center gap-2" style={{ flexWrap: 'wrap' }}>
+                    <button
+                      type="button"
+                      className="btn btn-outline btn-sm"
+                      onClick={() => handlePrintRecord(item)}
+                      aria-label={`Print assessment report for ${item.id}`}
+                    >
+                      <Printer size={15} aria-hidden="true" />
+                      <span>Print Report</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      className="btn btn-primary btn-sm"
+                      onClick={() => navigate(`/result/${item.id}`, { state: { assessment: item } })}
+                      aria-label={`Open details for assessment ${item.id}`}
+                    >
+                      <Eye size={15} aria-hidden="true" />
+                      <span>Open Details</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             );
           })}
-        </div>
-      )}
-
-      {/* Pagination Bar */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between" style={{ marginTop: '1rem', padding: '0.5rem 0' }}>
-          <span style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
-            Showing page {currentPage} of {totalPages} ({assessments.length} total records)
-          </span>
-
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              className="btn btn-outline btn-sm"
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-            >
-              <ChevronLeft size={16} />
-              <span>Previous</span>
-            </button>
-            <button
-              type="button"
-              className="btn btn-outline btn-sm"
-              disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
-            >
-              <span>Next</span>
-              <ChevronRight size={16} />
-            </button>
-          </div>
         </div>
       )}
 
@@ -420,17 +371,25 @@ export const History = () => {
         title="Delete Assessment Record?"
         footer={
           <>
-            <button type="button" className="btn btn-ghost" onClick={() => setDeleteModalOpen(false)}>
+            <button
+              type="button"
+              className="btn btn-ghost"
+              onClick={() => setDeleteModalOpen(false)}
+            >
               Cancel
             </button>
-            <button type="button" className="btn btn-danger" onClick={handleConfirmDelete}>
+            <button
+              type="button"
+              className="btn btn-danger"
+              onClick={handleConfirmDelete}
+            >
               Confirm Delete
             </button>
           </>
         }
       >
-        <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.95rem' }}>
-          Are you sure you want to delete assessment <strong>{itemToDelete?.id}</strong>? This action cannot be undone.
+        <p style={{ color: 'var(--color-text)', fontSize: '0.95rem', lineHeight: 1.6, margin: 0 }}>
+          Are you sure you want to delete assessment <strong>{itemToDelete?.id}</strong>? This will remove the saved answers from your history.
         </p>
       </Modal>
     </div>

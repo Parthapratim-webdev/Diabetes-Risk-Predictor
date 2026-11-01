@@ -21,12 +21,14 @@ export const DashboardLayout = () => {
   const { user, logout, isDemoMode } = useAuth();
   const navigate = useNavigate();
 
-  const formattedDate = new Intl.DateTimeFormat('en-US', {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  }).format(new Date());
+  const [formattedDate] = useState(() => {
+    return new Intl.DateTimeFormat('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    }).format(new Date());
+  });
 
   const handleLogout = async () => {
     await logout();
@@ -201,7 +203,7 @@ export const DashboardLayout = () => {
                     </div>
                   </Link>
                   <Link
-                    to="/health-insights"
+                    to="/learn-about-diabetes"
                     style={{ textDecoration: 'none' }}
                     onClick={() => setShowProfileMenu(false)}
                   >
