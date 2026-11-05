@@ -1,0 +1,99 @@
+{
+  "modelName": "Diabetes Risk Predictor \u2014 Educational Pipeline",
+  "modelVersion": "1.0",
+  "selectedModelType": "Random Forest",
+  "datasetName": "UCI Early Stage Diabetes Risk Prediction Dataset",
+  "trainingDate": "2026-11-01T19:40:13.180575+00:00",
+  "totalDatasetSamples": 520,
+  "trainingSamples": 416,
+  "testingSamples": 104,
+  "features": [
+    "Age",
+    "Gender",
+    "Polyuria",
+    "Polydipsia",
+    "sudden weight loss",
+    "weakness",
+    "Polyphagia",
+    "Genital thrush",
+    "visual blurring",
+    "Itching",
+    "Irritability",
+    "delayed healing",
+    "partial paresis",
+    "muscle stiffness",
+    "Alopecia",
+    "Obesity"
+  ],
+  "targetMapping": {
+    "0": "Negative (Low Diabetes Risk Profile)",
+    "1": "Positive (High Diabetes Risk Profile)"
+  },
+  "selectedModelEvaluation": {
+    "accuracy": 0.9615,
+    "precision": 0.9839,
+    "recall": 0.9531,
+    "specificity": 0.975,
+    "f1_score": 0.9683,
+    "roc_auc": 0.9988,
+    "false_negatives": 3,
+    "false_positives": 1,
+    "confusion_matrix": {
+      "true_negative": 39,
+      "false_positive": 1,
+      "false_negative": 3,
+      "true_positive": 61
+    }
+  },
+  "modelComparison": {
+    "Logistic Regression": {
+      "accuracy": 0.9423,
+      "precision": 0.9833,
+      "recall": 0.9219,
+      "specificity": 0.975,
+      "f1_score": 0.9516,
+      "roc_auc": 0.9906,
+      "false_negatives": 5,
+      "false_positives": 1,
+      "confusion_matrix": {
+        "true_negative": 39,
+        "false_positive": 1,
+        "false_negative": 5,
+        "true_positive": 59
+      }
+    },
+    "Decision Tree": {
+      "accuracy": 0.9808,
+      "precision": 1.0,
+      "recall": 0.9688,
+      "specificity": 1.0,
+      "f1_score": 0.9841,
+      "roc_auc": 0.9914,
+      "false_negatives": 2,
+      "false_positives": 0,
+      "confusion_matrix": {
+        "true_negative": 40,
+        "false_positive": 0,
+        "false_negative": 2,
+        "true_positive": 62
+      }
+    },
+    "Random Forest": {
+      "accuracy": 0.9615,
+      "precision": 0.9839,
+      "recall": 0.9531,
+      "specificity": 0.975,
+      "f1_score": 0.9683,
+      "roc_auc": 0.9988,
+      "false_negatives": 3,
+      "false_positives": 1,
+      "confusion_matrix": {
+        "true_negative": 39,
+        "false_positive": 1,
+        "false_negative": 3,
+        "true_positive": 61
+      }
+    }
+  },
+  "educationalDisclaimer": "This machine learning model was developed strictly for academic and educational purposes. It is NOT clinically validated, NOT a medical device, and CANNOT diagnose diabetes. Always consult a qualified healthcare provider for medical testing."
+}

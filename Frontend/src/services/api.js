@@ -5,7 +5,7 @@ import axios from 'axios';
  * Supports environment-based base URL and HTTP-Only cookies.
  */
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api',
+ baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api',
   withCredentials: true, // Configured for secure HTTP-only cookies from Express
   headers: {
     'Content-Type': 'application/json',
