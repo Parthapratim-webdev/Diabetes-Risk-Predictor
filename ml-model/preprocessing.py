@@ -110,29 +110,85 @@ def preprocess_data(df, is_training=True):
 def prepare_single_input(input_dict):
     """
     Validates and formats a single assessment input dictionary into a DataFrame
-    ready for model prediction. Supports flexible case matching.
+    ready for model prediction. Supports flexible case matching and adapts
+    clinical measurements (glucose, BP, BMI, etc.) into symptom indicators if not explicitly provided.
     """
     # Key normalization dictionary
     normalized_keys = {k.lower().strip(): v for k, v in input_dict.items()}
+
+    # Check for biometric measurements
+    glucose_val = normalized_keys.get('glucose')
+    try:
+        glucose_val = float(glucose_val) if glucose_val is not None and glucose_val != '' else None
+    except (ValueError, TypeError):
+        glucose_val = None
+
+    bmi_val = normalized_keys.get('bmi')
+    try:
+        bmi_val = float(bmi_val) if bmi_val is not None and bmi_val != '' else None
+    except (ValueError, TypeError):
+        bmi_val = None
+
+    # Derive BMI from heightCm & weightKg if missing
+    if bmi_val is None:
+        try:
+            h = float(normalized_keys.get('heightcm') or normalized_keys.get('height') or 0) / 100.0
+            w = float(normalized_keys.get('weightkg') or normalized_keys.get('weight') or 0)
+            if h > 0 and w > 0:
+                bmi_val = round(w / (h * h), 1)
+        except (ValueError, TypeError):
+            bmi_val = None
+
+    systolic_val = normalized_keys.get('systolicbp') or normalized_keys.get('systolic')
+    try:
+        systolic_val = float(systolic_val) if systolic_val is not None and systolic_val != '' else None
+    except (ValueError, TypeError):
+        systolic_val = None
+
+    family_hist = str(normalized_keys.get('familyhistory', '')).lower()
+    activity = str(normalized_keys.get('physicalactivity', '')).lower()
+
+    # Clinical fallback mapping rules
+    clinical_defaults = {
+        'obesity': 'Yes' if (bmi_val and bmi_val >= 30) else 'No',
+        'polyuria': 'Yes' if (glucose_val and glucose_val >= 140) or family_hist in ('yes', 'true') else 'No',
+        'polydipsia': 'Yes' if (glucose_val and glucose_val >= 140) else 'No',
+        'sudden weight loss': 'Yes' if (glucose_val and glucose_val >= 180) else 'No',
+        'weakness': 'Yes' if (glucose_val and glucose_val >= 140) or activity == 'sedentary' else 'No',
+        'polyphagia': 'Yes' if (glucose_val and glucose_val >= 160) else 'No',
+        'genital thrush': 'No',
+        'visual blurring': 'Yes' if (glucose_val and glucose_val >= 160) or (systolic_val and systolic_val >= 140) else 'No',
+        'itching': 'No',
+        'irritability': 'Yes' if (systolic_val and systolic_val >= 140) else 'No',
+        'delayed healing': 'Yes' if (glucose_val and glucose_val >= 150) else 'No',
+        'partial paresis': 'No',
+        'muscle stiffness': 'Yes' if (systolic_val and systolic_val >= 140) else 'No',
+        'alopecia': 'No',
+    }
 
     formatted = {}
 
     for col in FEATURE_COLUMNS:
         lower_col = col.lower()
         if lower_col not in normalized_keys:
-            # Special check for sudden weight loss variations
-            if lower_col == 'sudden weight loss' and 'suddenweightloss' in normalized_keys:
-                val = normalized_keys['suddenweightloss']
-            elif lower_col == 'genital thrush' and 'genitalthrush' in normalized_keys:
-                val = normalized_keys['genitalthrush']
-            elif lower_col == 'visual blurring' and 'visualblurring' in normalized_keys:
-                val = normalized_keys['visualblurring']
-            elif lower_col == 'delayed healing' and 'delayedhealing' in normalized_keys:
-                val = normalized_keys['delayedhealing']
-            elif lower_col == 'partial paresis' and 'partialparesis' in normalized_keys:
-                val = normalized_keys['partialparesis']
-            elif lower_col == 'muscle stiffness' and 'musclestiffness' in normalized_keys:
-                val = normalized_keys['musclestiffness']
+            # Check known aliases
+            alias_map = {
+                'sudden weight loss': 'suddenweightloss',
+                'genital thrush': 'genitalthrush',
+                'visual blurring': 'visualblurring',
+                'delayed healing': 'delayedhealing',
+                'partial paresis': 'partialparesis',
+                'muscle stiffness': 'musclestiffness',
+            }
+            if lower_col in alias_map and alias_map[lower_col] in normalized_keys:
+                val = normalized_keys[alias_map[lower_col]]
+            elif lower_col in clinical_defaults:
+                val = clinical_defaults[lower_col]
+            elif lower_col == 'gender':
+                raw_gender = normalized_keys.get('gender', 'Male')
+                val = 'Female' if str(raw_gender).lower() in ('female', 'f') else 'Male'
+            elif lower_col == 'age':
+                val = normalized_keys.get('age', 40)
             else:
                 raise ValueError(f"Missing required assessment feature: '{col}'")
         else:
@@ -147,6 +203,12 @@ def prepare_single_input(input_dict):
                 formatted[col] = age_val
             except Exception as e:
                 raise ValueError(f"Invalid age input: {val}. Error: {e}")
+        elif col == 'Gender':
+            str_gender = str(val).capitalize()
+            if str_gender in ('Male', 'Female'):
+                formatted[col] = BINARY_MAPPINGS['Gender'][str_gender]
+            else:
+                formatted[col] = 1 # Default male if unspecified
         else:
             # Map categorical values
             mapping = BINARY_MAPPINGS[col]

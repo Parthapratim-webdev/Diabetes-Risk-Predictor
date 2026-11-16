@@ -267,11 +267,11 @@ IMPORTANT LIMITATIONS
           <div>
             {isServiceConnected ? (
               <span className="badge badge-success" style={{ fontSize: '0.85rem', padding: '0.35rem 0.85rem' }}>
-                Service Response Received
+                Assessment Completed
               </span>
             ) : (
               <span className="badge badge-neutral" style={{ fontSize: '0.85rem', padding: '0.35rem 0.85rem' }}>
-                Answers Recorded
+                Assessment Recorded
               </span>
             )}
           </div>
@@ -348,16 +348,38 @@ IMPORTANT LIMITATIONS
 
             {/* If valid probability is returned */}
             {predictionResult.estimatedProbability !== undefined && (
-              <div style={{ marginBottom: '1rem', padding: '0.85rem 1rem', backgroundColor: '#FFFFFF', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)' }}>
+              <div style={{ marginBottom: '1rem', padding: '1.1rem 1.25rem', backgroundColor: '#FFFFFF', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border)' }}>
                 <div className="flex items-center justify-between" style={{ marginBottom: '0.35rem' }}>
-                  <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--color-text)' }}>
+                  <span style={{ fontSize: '0.925rem', fontWeight: 700, color: 'var(--color-text)' }}>
                     Statistical Alignment Indicator
                   </span>
-                  <span style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--color-primary)' }}>
+                  <span style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--color-primary)' }}>
                     {predictionResult.estimatedProbability}%
                   </span>
                 </div>
-                <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--color-text-secondary)', lineHeight: 1.5 }}>
+                {/* Google Stitch visual meter */}
+                <div className="stitch-risk-meter" style={{ margin: '0.5rem 0' }}>
+                  <div className="stitch-meter-track" style={{ height: '10px' }}>
+                    <div
+                      className="stitch-meter-fill"
+                      style={{
+                        width: `${Math.min(Math.max(predictionResult.estimatedProbability, 5), 100)}%`,
+                        background:
+                          predictionResult.estimatedProbability > 60
+                            ? 'linear-gradient(90deg, #F59E0B, #DC2626)'
+                            : predictionResult.estimatedProbability > 30
+                            ? 'linear-gradient(90deg, #10B981, #F59E0B)'
+                            : 'linear-gradient(90deg, #10B981, #34D399)',
+                      }}
+                    />
+                  </div>
+                  <div className="stitch-meter-labels">
+                    <span>Lower Correlation (0–30%)</span>
+                    <span>Moderate (31–60%)</span>
+                    <span>Elevated (61–100%)</span>
+                  </div>
+                </div>
+                <p style={{ margin: 0, fontSize: '0.825rem', color: 'var(--color-text-secondary)', lineHeight: 1.55 }}>
                   This percentage represents statistical correlation within reference study data. It does not measure your individual certainty or replace medical testing.
                 </p>
               </div>

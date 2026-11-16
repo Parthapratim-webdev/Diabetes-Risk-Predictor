@@ -92,11 +92,13 @@ export const Dashboard = () => {
       {
         label: 'Fasting Blood Glucose (mg/dL)',
         data: timelineAssessments.map((item) => item.measurements?.glucose || null),
-        borderColor: '#2563EB',
-        backgroundColor: 'rgba(37, 99, 235, 0.08)',
+        borderColor: '#1A73E8',
+        backgroundColor: 'rgba(26, 115, 232, 0.12)',
         fill: true,
-        tension: 0.3,
-        pointBackgroundColor: '#2563EB',
+        tension: 0.4,
+        pointBackgroundColor: '#1A73E8',
+        pointRadius: 4,
+        pointHoverRadius: 6,
         spanGaps: true,
       },
     ],
@@ -108,22 +110,25 @@ export const Dashboard = () => {
     plugins: {
       legend: {
         position: 'top',
-        labels: { boxWidth: 12, usePointStyle: true, font: { family: 'Inter', size: 12 } },
+        labels: { boxWidth: 12, usePointStyle: true, font: { family: 'Plus Jakarta Sans', size: 12, weight: 600 } },
       },
       tooltip: {
-        backgroundColor: '#1E293B',
-        padding: 10,
-        cornerRadius: 8,
+        backgroundColor: '#0F172A',
+        titleFont: { family: 'Plus Jakarta Sans', size: 13, weight: 700 },
+        bodyFont: { family: 'Plus Jakarta Sans', size: 12 },
+        padding: 12,
+        cornerRadius: 10,
+        boxPadding: 4,
       },
     },
     scales: {
       y: {
         grid: { color: '#F1F5F9' },
-        ticks: { font: { family: 'Inter', size: 11 } },
+        ticks: { font: { family: 'Plus Jakarta Sans', size: 11 }, color: '#64748B' },
       },
       x: {
         grid: { display: false },
-        ticks: { font: { family: 'Inter', size: 11 } },
+        ticks: { font: { family: 'Plus Jakarta Sans', size: 11 }, color: '#64748B' },
       },
     },
   };

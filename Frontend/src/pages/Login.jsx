@@ -32,6 +32,7 @@ export const Login = () => {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -40,6 +41,12 @@ export const Login = () => {
     },
     mode: 'onTouched',
   });
+
+  const handleAutoFillDemo = () => {
+    setValue('email', 'alex.morgan@healthportal.demo', { shouldValidate: true });
+    setValue('password', 'demo1234', { shouldValidate: true });
+    setErrorMessage(null);
+  };
 
   const onSubmit = async (data) => {
     if (isSubmitting) return;
@@ -279,17 +286,25 @@ export const Login = () => {
               </button>
             </form>
 
-            {/* Optional Guest Demo Mode (Explicitly marked, honest preview) */}
-            <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
+            {/* Quick Demo & Guest Access */}
+            <div style={{ marginTop: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+              <button
+                type="button"
+                onClick={handleAutoFillDemo}
+                className="btn btn-outline btn-sm"
+                style={{ width: '100%', fontSize: '0.85rem' }}
+              >
+                <span>Auto-fill Demo Account</span>
+              </button>
               <button
                 type="button"
                 onClick={handleGuestDemoAccess}
-                className="btn btn-outline btn-sm"
+                className="btn btn-ghost btn-sm"
                 style={{ width: '100%', color: 'var(--color-text-secondary)', fontSize: '0.85rem' }}
                 disabled={isSubmitting}
               >
                 <UserCheck size={16} />
-                <span>Continue as Guest (Demo Mode - No Account Needed)</span>
+                <span>Continue as Guest</span>
               </button>
             </div>
 

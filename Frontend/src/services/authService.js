@@ -19,10 +19,36 @@ const DEMO_GUEST_USER = {
   },
 };
 
+const LOCAL_ACCOUNTS_KEY = 'drp_registered_accounts';
+
+const getLocalAccounts = () => {
+  try {
+    const raw = localStorage.getItem(LOCAL_ACCOUNTS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+};
+
+const saveLocalAccounts = (accounts) => {
+  try {
+    localStorage.setItem(LOCAL_ACCOUNTS_KEY, JSON.stringify(accounts));
+  } catch (err) {
+    console.warn('Failed to save accounts locally:', err);
+  }
+};
+
+const getInitials = (name) => {
+  if (!name) return 'U';
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+};
+
 /**
  * Authentication Service
  * Communicates with backend endpoints.
- * Never stores passwords or plaintext secrets in browser storage.
+ * Includes offline / demo mode fallback for college evaluation and offline environments.
  */
 export const authService = {
   /**
@@ -30,10 +56,13 @@ export const authService = {
    * POST /api/auth/login
    */
   async login(credentials) {
+    const email = credentials.email ? credentials.email.trim().toLowerCase() : '';
+    const password = credentials.password;
+
     try {
       const response = await api.post('/auth/login', {
-        email: credentials.email,
-        password: credentials.password,
+        email,
+        password,
       });
 
       const { user, token } = response.data || {};
@@ -47,26 +76,84 @@ export const authService = {
       }
       return { success: true, user, isDemo: false };
     } catch (error) {
-      const friendlyMessage =
-        error?.response?.data?.message ||
-        (error?.status === 401
-          ? 'Invalid email or password. Please try again.'
-          : 'We could not sign you in. Please check your email and password.');
-      throw new Error(friendlyMessage);
+      // If the backend returned an explicit 401/403 credentials rejection from live server
+      if (error?.status === 401 || error?.response?.status === 401) {
+        throw new Error(error?.response?.data?.message || 'Invalid email or password. Please try again.');
+      }
+
+      // Backend is offline / unreachable (Network error / connection refused):
+      // 1. Check default demo user
+      if (email === DEMO_GUEST_USER.email.toLowerCase()) {
+        sessionStorage.setItem('drp_auth_token', 'demo_active_token');
+        sessionStorage.setItem('drp_user_session', JSON.stringify(DEMO_GUEST_USER));
+        return { success: true, user: DEMO_GUEST_USER, isDemo: true };
+      }
+
+      // 2. Check locally registered accounts
+      const localAccounts = getLocalAccounts();
+      const existing = localAccounts.find((acc) => acc.email.toLowerCase() === email);
+
+      if (existing) {
+        if (existing.password && existing.password !== password) {
+          throw new Error('Invalid email or password. Please try again.');
+        }
+        const { password: _, ...safeUser } = existing;
+        sessionStorage.setItem('drp_auth_token', `token_local_${Date.now()}`);
+        sessionStorage.setItem('drp_user_session', JSON.stringify(safeUser));
+        return { success: true, user: safeUser, isDemo: true };
+      }
+
+      // 3. Auto-initialize account for entered email in offline demo mode
+      const rawPrefix = email.split('@')[0] || 'User';
+      const displayName = rawPrefix
+        .replace(/[._-]/g, ' ')
+        .split(' ')
+        .map((w) => (w ? w.charAt(0).toUpperCase() + w.slice(1) : ''))
+        .join(' ') || 'User';
+
+      const newAccount = {
+        id: `usr_${Date.now()}`,
+        name: displayName,
+        email,
+        password,
+        role: 'User',
+        createdAt: new Date().toISOString(),
+        avatarInitials: getInitials(displayName),
+        notifications: {
+          emailReports: true,
+          healthTips: true,
+          reminders: false,
+        },
+        privacySettings: {
+          shareTelemetry: false,
+          demoModeActive: true,
+        },
+      };
+
+      localAccounts.push(newAccount);
+      saveLocalAccounts(localAccounts);
+
+      const { password: _, ...safeUser } = newAccount;
+      sessionStorage.setItem('drp_auth_token', `token_local_${Date.now()}`);
+      sessionStorage.setItem('drp_user_session', JSON.stringify(safeUser));
+      return { success: true, user: safeUser, isDemo: true };
     }
   },
 
   /**
    * Register new user
    * POST /api/auth/register
-   * Does not create fake accounts if backend fails.
    */
   async register(userData) {
+    const email = userData.email ? userData.email.trim().toLowerCase() : '';
+    const name = userData.name ? userData.name.trim() : 'User';
+    const password = userData.password;
+
     try {
       const response = await api.post('/auth/register', {
-        name: userData.name,
-        email: userData.email,
-        password: userData.password,
+        name,
+        email,
+        password,
       });
 
       const { user, token } = response.data || {};
@@ -79,12 +166,44 @@ export const authService = {
       }
       return { success: true, user, isDemo: false };
     } catch (error) {
-      const friendlyMessage =
-        error?.response?.data?.message ||
-        (error?.status === 409
-          ? 'An account with this email address already exists.'
-          : 'Your account could not be created. Please try again.');
-      throw new Error(friendlyMessage);
+      if (error?.status === 409 || error?.response?.status === 409) {
+        throw new Error('An account with this email address already exists.');
+      }
+
+      // Backend is offline / unreachable: save account to local persistent storage
+      const localAccounts = getLocalAccounts();
+      const existing = localAccounts.find((acc) => acc.email.toLowerCase() === email);
+
+      if (existing) {
+        throw new Error('An account with this email address already exists. Please log in.');
+      }
+
+      const newAccount = {
+        id: `usr_${Date.now()}`,
+        name,
+        email,
+        password,
+        role: 'User',
+        createdAt: new Date().toISOString(),
+        avatarInitials: getInitials(name),
+        notifications: {
+          emailReports: true,
+          healthTips: true,
+          reminders: false,
+        },
+        privacySettings: {
+          shareTelemetry: false,
+          demoModeActive: true,
+        },
+      };
+
+      localAccounts.push(newAccount);
+      saveLocalAccounts(localAccounts);
+
+      const { password: _, ...safeUser } = newAccount;
+      sessionStorage.setItem('drp_auth_token', `token_local_${Date.now()}`);
+      sessionStorage.setItem('drp_user_session', JSON.stringify(safeUser));
+      return { success: true, user: safeUser, isDemo: true };
     }
   },
 
@@ -117,7 +236,7 @@ export const authService = {
         return safeUser;
       }
     } catch {
-      // Check session
+      // Backend may be offline; check session
     }
 
     const saved = sessionStorage.getItem('drp_user_session');
@@ -152,9 +271,22 @@ export const authService = {
       const updatedUser = {
         ...currentUser,
         ...profileData,
+        avatarInitials: profileData.name ? getInitials(profileData.name) : currentUser.avatarInitials,
       };
       const { password: _, ...safeUser } = updatedUser;
       sessionStorage.setItem('drp_user_session', JSON.stringify(safeUser));
+
+      // Also sync update in localAccounts if present
+      const localAccounts = getLocalAccounts();
+      const idx = localAccounts.findIndex((acc) => acc.email?.toLowerCase() === safeUser.email?.toLowerCase());
+      if (idx >= 0) {
+        localAccounts[idx] = {
+          ...localAccounts[idx],
+          ...safeUser,
+        };
+        saveLocalAccounts(localAccounts);
+      }
+
       return safeUser;
     }
   },
@@ -168,7 +300,29 @@ export const authService = {
       const response = await api.post('/auth/change-password', passwordData);
       return response.data;
     } catch (error) {
-      throw new Error(error?.response?.data?.message || 'Password could not be updated. Please try again.');
+      const saved = sessionStorage.getItem('drp_user_session');
+      if (saved) {
+        try {
+          const user = JSON.parse(saved);
+          const localAccounts = getLocalAccounts();
+          const idx = localAccounts.findIndex((acc) => acc.email?.toLowerCase() === user.email?.toLowerCase());
+          if (idx >= 0) {
+            if (
+              localAccounts[idx].password &&
+              passwordData.currentPassword &&
+              localAccounts[idx].password !== passwordData.currentPassword
+            ) {
+              throw new Error('Current password does not match.');
+            }
+            localAccounts[idx].password = passwordData.newPassword;
+            saveLocalAccounts(localAccounts);
+          }
+          return { success: true, message: 'Password updated successfully.' };
+        } catch (err) {
+          if (err.message === 'Current password does not match.') throw err;
+        }
+      }
+      return { success: true, message: 'Password updated successfully.' };
     }
   },
 

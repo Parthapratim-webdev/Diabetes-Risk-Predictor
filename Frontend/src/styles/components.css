@@ -1,71 +1,85 @@
 /* ==========================================================================
-   REUSABLE UI COMPONENTS STYLES
+   GOOGLE STITCH REUSABLE UI COMPONENTS STYLES
+   Modern Healthcare SaaS Design Language
+   Inspired by stitch.withgoogle.com UI Components
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
-   1. BUTTONS
+   1. BUTTONS & ACTIONS
    -------------------------------------------------------------------------- */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 0.55rem;
+  font-family: var(--font-heading);
   font-weight: 600;
   font-size: 0.95rem;
   line-height: 1.25;
-  padding: 0.7rem 1.25rem;
-  min-height: 44px;
+  padding: 0.75rem 1.4rem;
+  min-height: 46px;
   border-radius: var(--radius-md);
   border: 1px solid transparent;
   transition: all var(--transition-fast);
   white-space: nowrap;
   user-select: none;
   text-decoration: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(0) scale(0.985);
 }
 
 .btn:disabled {
-  opacity: 0.6;
+  opacity: 0.55;
   cursor: not-allowed;
   transform: none !important;
   box-shadow: none !important;
 }
 
 .btn-primary {
-  background-color: var(--color-primary);
+  background: linear-gradient(180deg, #2563EB 0%, #1D4ED8 100%);
   color: #FFFFFF;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05), 0 3px 10px rgba(37, 99, 235, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background-color: var(--color-primary-hover);
-  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
-  transform: translateY(-1px);
+  background: linear-gradient(180deg, #1D4ED8 0%, #1E40AF 100%);
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.38), 0 1px 3px rgba(16, 24, 40, 0.1);
+  transform: translateY(-1.5px);
   color: #FFFFFF;
 }
 
 .btn-secondary {
-  background-color: var(--color-secondary);
+  background: linear-gradient(180deg, #0D9488 0%, #0F766E 100%);
   color: #FFFFFF;
-  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.25);
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05), 0 3px 10px rgba(13, 148, 136, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background-color: var(--color-secondary-hover);
-  box-shadow: 0 6px 16px rgba(13, 148, 136, 0.35);
-  transform: translateY(-1px);
+  background: linear-gradient(180deg, #0F766E 0%, #115E59 100%);
+  box-shadow: 0 4px 16px rgba(13, 148, 136, 0.38);
+  transform: translateY(-1.5px);
   color: #FFFFFF;
 }
 
 .btn-outline {
-  background-color: transparent;
-  border-color: var(--color-border);
+  background-color: #FFFFFF;
+  border: 1.5px solid var(--color-border);
   color: var(--color-text);
+  box-shadow: var(--shadow-xs);
 }
 
 .btn-outline:hover:not(:disabled) {
   background-color: var(--color-primary-light);
   border-color: var(--color-primary);
   color: var(--color-primary);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.1);
 }
 
 .btn-ghost {
@@ -74,52 +88,66 @@
 }
 
 .btn-ghost:hover:not(:disabled) {
-  background-color: var(--color-bg);
-  color: var(--color-text);
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
 }
 
 .btn-danger {
-  background-color: var(--color-error);
+  background: linear-gradient(180deg, #DC2626 0%, #B91C1C 100%);
   color: #FFFFFF;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.25);
 }
 
 .btn-danger:hover:not(:disabled) {
-  background-color: var(--color-error-hover);
-  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+  background: linear-gradient(180deg, #B91C1C 0%, #991B1B 100%);
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35);
+  transform: translateY(-1px);
 }
 
 .btn-sm {
-  padding: 0.45rem 0.85rem;
+  padding: 0.45rem 0.95rem;
   font-size: 0.85rem;
+  min-height: 36px;
   border-radius: var(--radius-sm);
 }
 
 .btn-lg {
-  padding: 0.9rem 1.75rem;
+  padding: 0.9rem 1.85rem;
   font-size: 1.05rem;
+  min-height: 52px;
   border-radius: var(--radius-lg);
 }
 
+.btn-pill {
+  border-radius: var(--radius-full);
+}
+
 .btn-icon-only {
-  padding: 0.6rem;
+  padding: 0.65rem;
+  min-height: 40px;
+  width: 40px;
   border-radius: var(--radius-md);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* --------------------------------------------------------------------------
-   2. CARDS
+   2. STITCH CARDS & SURFACES
    -------------------------------------------------------------------------- */
 .card {
   background-color: var(--color-card);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: 1.5rem;
-  box-shadow: var(--shadow-sm);
+  border-radius: var(--radius-xl);
+  padding: 1.65rem;
+  box-shadow: var(--shadow-stitch-card);
   transition: transform var(--transition-normal), box-shadow var(--transition-normal), border-color var(--transition-normal);
+  position: relative;
 }
 
 .card-hover:hover {
   transform: translateY(-3px);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-stitch-card-hover);
   border-color: #CBD5E1;
 }
 
@@ -127,21 +155,22 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 1.25rem;
-  padding-bottom: 0.75rem;
+  margin-bottom: 1.35rem;
+  padding-bottom: 0.9rem;
   border-bottom: 1px solid var(--color-border-light);
 }
 
 .card-title {
-  font-size: 1.15rem;
-  font-weight: 600;
+  font-size: 1.2rem;
+  font-weight: 700;
   color: var(--color-text);
+  letter-spacing: -0.015em;
 }
 
 .card-subtitle {
   font-size: 0.875rem;
   color: var(--color-text-secondary);
-  margin-top: 0.2rem;
+  margin-top: 0.25rem;
 }
 
 /* --------------------------------------------------------------------------
@@ -150,19 +179,20 @@
 .badge {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.25rem 0.65rem;
+  gap: 0.4rem;
+  padding: 0.3rem 0.75rem;
   border-radius: var(--radius-full);
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
+  line-height: 1.2;
 }
 
 .badge-primary {
   background-color: var(--color-primary-light);
   color: var(--color-primary);
-  border: 1px solid rgba(37, 99, 235, 0.2);
+  border: 1px solid rgba(26, 115, 232, 0.2);
 }
 
 .badge-secondary {
@@ -174,19 +204,19 @@
 .badge-success {
   background-color: var(--color-success-light);
   color: var(--color-success-text);
-  border: 1px solid rgba(22, 163, 74, 0.2);
+  border: 1px solid rgba(22, 163, 74, 0.22);
 }
 
 .badge-warning {
   background-color: var(--color-warning-light);
   color: var(--color-warning-text);
-  border: 1px solid rgba(245, 158, 11, 0.2);
+  border: 1px solid rgba(217, 119, 6, 0.22);
 }
 
 .badge-danger {
   background-color: var(--color-error-light);
   color: var(--color-error-text);
-  border: 1px solid rgba(220, 38, 38, 0.2);
+  border: 1px solid rgba(220, 38, 38, 0.22);
 }
 
 .badge-neutral {
@@ -196,18 +226,18 @@
 }
 
 /* --------------------------------------------------------------------------
-   4. FORM CONTROLS
+   4. FORM CONTROLS & INPUTS
    -------------------------------------------------------------------------- */
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
-  margin-bottom: 1.25rem;
+  gap: 0.5rem;
+  margin-bottom: 1.35rem;
   text-align: left;
 }
 
 .form-label {
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   font-weight: 600;
   color: var(--color-text);
   display: flex;
@@ -229,38 +259,38 @@
 
 .form-input, .form-select, .form-textarea {
   width: 100%;
-  padding: 0.75rem 1rem;
+  padding: 0.75rem 1.1rem;
   min-height: 48px;
-  font-size: 1rem;
+  font-size: 0.975rem;
   color: var(--color-text);
   background-color: #FFFFFF;
-  border: 1px solid var(--color-border);
+  border: 1.5px solid var(--color-border);
   border-radius: var(--radius-md);
   transition: all var(--transition-fast);
 }
 
 .form-input:focus, .form-select:focus, .form-textarea:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  box-shadow: 0 0 0 4px rgba(26, 115, 232, 0.14);
   outline: none;
 }
 
 .form-input.has-error, .form-select.has-error {
   border-color: var(--color-error);
-  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+  box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.12);
 }
 
 .form-input-with-icon-left {
-  padding-left: 2.75rem;
+  padding-left: 2.85rem;
 }
 
 .form-input-with-icon-right {
-  padding-right: 2.75rem;
+  padding-right: 2.85rem;
 }
 
 .input-icon-left {
   position: absolute;
-  left: 0.9rem;
+  left: 1rem;
   color: var(--color-text-muted);
   pointer-events: none;
   display: flex;
@@ -269,7 +299,7 @@
 
 .input-icon-right {
   position: absolute;
-  right: 0.9rem;
+  right: 1rem;
   color: var(--color-text-muted);
   background: none;
   border: none;
@@ -280,57 +310,58 @@
 }
 
 .form-error {
-  font-size: 0.8rem;
+  font-size: 0.825rem;
   color: var(--color-error);
   display: flex;
   align-items: center;
-  gap: 0.25rem;
-  margin-top: 0.2rem;
+  gap: 0.35rem;
+  margin-top: 0.25rem;
+  font-weight: 500;
 }
 
 .form-helper {
-  font-size: 0.8rem;
+  font-size: 0.825rem;
   color: var(--color-text-secondary);
 }
 
 .checkbox-label {
   display: flex;
   align-items: flex-start;
-  gap: 0.65rem;
-  font-size: 0.9rem;
+  gap: 0.75rem;
+  font-size: 0.925rem;
   color: var(--color-text-secondary);
   cursor: pointer;
   user-select: none;
 }
 
 .checkbox-label input[type="checkbox"] {
-  margin-top: 0.18rem;
-  width: 1.1rem;
-  height: 1.1rem;
+  margin-top: 0.2rem;
+  width: 1.15rem;
+  height: 1.15rem;
   accent-color: var(--color-primary);
   cursor: pointer;
 }
 
 /* --------------------------------------------------------------------------
-   5. STAT CARD
+   5. STAT CARD & METRICS
    -------------------------------------------------------------------------- */
 .stat-card {
   background-color: var(--color-card);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: 1.35rem 1.5rem;
+  border-radius: var(--radius-xl);
+  padding: 1.5rem 1.65rem;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-stitch-card);
   transition: all var(--transition-normal);
   position: relative;
   overflow: hidden;
 }
 
 .stat-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  transform: translateY(-2.5px);
+  box-shadow: var(--shadow-stitch-card-hover);
   border-color: #CBD5E1;
 }
 
@@ -341,37 +372,39 @@
 
 .stat-title {
   font-size: 0.85rem;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
   color: var(--color-text-secondary);
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.4rem;
 }
 
 .stat-value {
-  font-size: 1.85rem;
-  font-weight: 700;
+  font-size: 2.15rem;
+  font-weight: 800;
   color: var(--color-text);
-  line-height: 1.2;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
 }
 
 .stat-subtext {
-  font-size: 0.8rem;
+  font-size: 0.825rem;
   color: var(--color-text-muted);
-  margin-top: 0.35rem;
+  margin-top: 0.45rem;
   display: flex;
   align-items: center;
-  gap: 0.3rem;
+  gap: 0.35rem;
 }
 
 .stat-icon-wrapper {
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
   border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
 }
 
 /* --------------------------------------------------------------------------
@@ -383,22 +416,23 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(15, 23, 42, 0.6);
-  backdrop-filter: blur(4px);
+  background-color: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 1.5rem;
   z-index: 1000;
-  animation: fadeIn 0.2s ease-out;
+  animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .modal-container {
   background-color: var(--color-card);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-2xl);
   box-shadow: var(--shadow-xl);
   width: 100%;
-  max-width: 540px;
+  max-width: 560px;
   max-height: 90vh;
   display: flex;
   flex-direction: column;
@@ -408,7 +442,7 @@
 }
 
 .modal-header {
-  padding: 1.25rem 1.5rem;
+  padding: 1.35rem 1.65rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -416,15 +450,16 @@
 }
 
 .modal-title {
-  font-size: 1.25rem;
+  font-size: 1.3rem;
   font-weight: 700;
   color: var(--color-text);
+  letter-spacing: -0.015em;
 }
 
 .modal-close-btn {
   color: var(--color-text-secondary);
   border-radius: var(--radius-sm);
-  padding: 0.4rem;
+  padding: 0.45rem;
   transition: all var(--transition-fast);
 }
 
@@ -434,26 +469,26 @@
 }
 
 .modal-body {
-  padding: 1.5rem;
+  padding: 1.65rem;
   overflow-y: auto;
 }
 
 .modal-footer {
-  padding: 1rem 1.5rem;
+  padding: 1.15rem 1.65rem;
   display: flex;
   justify-content: flex-end;
-  gap: 0.75rem;
+  gap: 0.85rem;
   border-top: 1px solid var(--color-border-light);
-  background-color: #FAFCFE;
+  background-color: #F8FAFD;
 }
 
 /* --------------------------------------------------------------------------
    7. LOADING & SKELETONS
    -------------------------------------------------------------------------- */
 .spinner {
-  width: 24px;
-  height: 24px;
-  border: 3px solid rgba(37, 99, 235, 0.2);
+  width: 26px;
+  height: 26px;
+  border: 3px solid rgba(26, 115, 232, 0.2);
   border-top-color: var(--color-primary);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
@@ -461,19 +496,19 @@
 }
 
 .spinner-sm {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   border-width: 2px;
 }
 
 .spinner-lg {
-  width: 48px;
-  height: 48px;
+  width: 50px;
+  height: 50px;
   border-width: 4px;
 }
 
 .spinner-white {
-  border-color: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.35);
   border-top-color: #FFFFFF;
 }
 
@@ -489,7 +524,7 @@
    -------------------------------------------------------------------------- */
 .empty-state {
   text-align: center;
-  padding: 3.5rem 1.5rem;
+  padding: 4rem 1.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -497,29 +532,30 @@
 }
 
 .empty-state-icon {
-  width: 64px;
-  height: 64px;
+  width: 68px;
+  height: 68px;
   border-radius: 50%;
   background-color: var(--color-primary-light);
   color: var(--color-primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.35rem;
+  box-shadow: 0 4px 14px rgba(26, 115, 232, 0.15);
 }
 
 .empty-state-title {
-  font-size: 1.25rem;
+  font-size: 1.35rem;
   font-weight: 700;
   color: var(--color-text);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.55rem;
 }
 
 .empty-state-description {
-  max-width: 420px;
-  font-size: 0.95rem;
+  max-width: 440px;
+  font-size: 0.975rem;
   color: var(--color-text-secondary);
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.65rem;
 }
 
 /* --------------------------------------------------------------------------
@@ -528,13 +564,14 @@
 .alert-banner {
   display: flex;
   align-items: flex-start;
-  gap: 0.85rem;
-  padding: 1rem 1.25rem;
-  border-radius: var(--radius-md);
-  font-size: 0.9rem;
-  line-height: 1.5;
-  margin-bottom: 1.25rem;
+  gap: 0.95rem;
+  padding: 1.1rem 1.35rem;
+  border-radius: var(--radius-lg);
+  font-size: 0.925rem;
+  line-height: 1.55;
+  margin-bottom: 1.35rem;
   border: 1px solid transparent;
+  box-shadow: var(--shadow-xs);
 }
 
 .alert-banner.info {
@@ -562,7 +599,46 @@
 }
 
 /* --------------------------------------------------------------------------
-   10. KEYFRAME ANIMATIONS
+   10. RISK GAUGE & PROGRESS BAR (STITCH COMPONENT)
+   -------------------------------------------------------------------------- */
+.stitch-risk-meter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin: 1.25rem 0;
+}
+
+.stitch-meter-track {
+  width: 100%;
+  height: 12px;
+  background: #E2E8F0;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  position: relative;
+  display: flex;
+}
+
+.stitch-meter-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.stitch-meter-segment {
+  flex: 1;
+  height: 100%;
+}
+
+.stitch-meter-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.775rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+/* --------------------------------------------------------------------------
+   11. KEYFRAME ANIMATIONS
    -------------------------------------------------------------------------- */
 @keyframes spin {
   to { transform: rotate(360deg); }
@@ -579,6 +655,6 @@
 }
 
 @keyframes scaleUp {
-  from { opacity: 0; transform: scale(0.95); }
+  from { opacity: 0; transform: scale(0.96); }
   to { opacity: 1; transform: scale(1); }
 }

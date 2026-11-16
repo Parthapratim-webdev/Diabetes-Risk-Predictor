@@ -89,14 +89,14 @@ export const Navbar = () => {
   ];
 
   return (
-    <nav className="navbar" role="navigation" aria-label="Main Navigation">
+    <nav className="navbar stitch-glass" role="navigation" aria-label="Main Navigation">
       <div className="container navbar-container">
         {/* Brand Logo */}
         <Link to="/" className="brand-logo" onClick={closeMobileMenu}>
-          <div className="brand-icon">
+          <div className="brand-icon" style={{ background: 'linear-gradient(135deg, #1A73E8 0%, #0D9488 100%)', boxShadow: '0 4px 12px rgba(26, 115, 232, 0.28)' }}>
             <Heart size={20} fill="#FFFFFF" />
           </div>
-          <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontWeight: 800, letterSpacing: '-0.02em' }}>
             <span>DiabetesRisk</span>
             <span style={{ color: 'var(--color-primary)' }}>Predictor</span>
           </span>

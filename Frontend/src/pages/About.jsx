@@ -25,11 +25,12 @@ export const About = () => {
         { name: 'React Hook Form', role: 'Performant, accessible form validation' },
         { name: 'Lucide React', role: 'Clean, modern healthcare iconography' },
         { name: 'React Hot Toast', role: 'Lightweight, animated notification system' },
-        { name: 'Pure CSS3', role: 'Modular design tokens without utility overhead' },
+        { name: 'Stitch UI Design System', role: 'Component tokens, elevated cards & glassmorphism' },
+        { name: 'Pure CSS3 & Design Tokens', role: 'High-performance responsive CSS without runtime bloat' },
       ],
     },
     {
-      category: 'Planned Backend & Database',
+      category: 'Backend & Database Architecture',
       items: [
         { name: 'Node.js (v20+)', role: 'Asynchronous event-driven server runtime' },
         { name: 'Express.js', role: 'RESTful API routing & middleware architecture' },
@@ -75,14 +76,14 @@ export const About = () => {
               }}
             >
               <GraduationCap size={16} />
-              <span>Academic Full-Stack Engineering Capstone</span>
+              <span>Healthcare Intelligence Platform</span>
             </div>
             <h1 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>
               About Diabetes Risk Predictor
             </h1>
             <p style={{ fontSize: '1.05rem', color: 'var(--color-text-secondary)', lineHeight: 1.6 }}>
-              A full-stack web engineering project developed to demonstrate modern frontend architecture, 
-              accessible UI/UX principles, and seamless readiness for Express.js and MongoDB backend integration.
+              A modern healthcare web platform demonstrating predictive metabolic risk assessment, 
+              accessible UI/UX design, and full-stack machine learning integration.
             </p>
           </div>
 

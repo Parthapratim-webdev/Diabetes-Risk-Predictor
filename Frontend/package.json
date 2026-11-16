@@ -6,8 +6,8 @@
   "description": "Educational healthcare web application for diabetes risk factor evaluation and analytics (College Full-Stack Project)",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "dev": "vite --configLoader runner",
+    "build": "vite build --configLoader runner",
     "lint": "oxlint",
     "preview": "vite preview"
   },

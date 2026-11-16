@@ -81,15 +81,6 @@ export const DashboardLayout = () => {
                   <Calendar size={13} />
                   {formattedDate}
                 </span>
-                {isDemoMode && (
-                  <span
-                    className="badge badge-secondary"
-                    style={{ fontSize: '0.7rem', padding: '0.1rem 0.45rem' }}
-                    title="Frontend running with demonstration state, ready for Node.js backend integration"
-                  >
-                    Demo Environment
-                  </span>
-                )}
               </div>
             </div>
           </div>

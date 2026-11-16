@@ -34,14 +34,10 @@ export const Footer = () => {
                 Diabetes Risk Predictor
               </span>
             </div>
-            <p style={{ fontSize: '0.875rem', lineHeight: 1.6, color: '#94A3B8', marginBottom: '1.25rem' }}>
+            <p style={{ fontSize: '0.875rem', lineHeight: 1.6, color: '#94A3B8', margin: 0 }}>
               An interactive, modern educational platform designed to empower individuals with evidence-based insights 
               on diabetes risk indicators and preventative lifestyle habits.
             </p>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(255,255,255,0.06)', padding: '0.4rem 0.8rem', borderRadius: 'var(--radius-sm)', fontSize: '0.8rem', color: '#CBD5E1' }}>
-              <Award size={14} color="#38BDF8" />
-              <span>College Full-Stack Capstone Project</span>
-            </div>
           </div>
 
           <div className="footer-col">
@@ -82,11 +78,10 @@ export const Footer = () => {
           </div>
 
           <div className="footer-col">
-            <h4>Project & Tech</h4>
+            <h4>Information</h4>
             <ul className="footer-links">
               <li><Link to="/about">System Architecture</Link></li>
-              <li><Link to="/about#api-specs">API Endpoints Spec</Link></li>
-              <li><Link to="/about#technologies">MERN Stack Details</Link></li>
+              <li><Link to="/learn-about-diabetes">Clinical Guidelines</Link></li>
               <li><Link to="/profile">Data & Privacy Settings</Link></li>
             </ul>
           </div>
@@ -94,12 +89,7 @@ export const Footer = () => {
 
         {/* Footer Bottom Bar */}
         <div className="footer-bottom">
-          <p>© {currentYear} Diabetes Risk Predictor. Academic Full-Stack Engineering Demonstration.</p>
-          <div className="flex items-center gap-4">
-            <span style={{ color: '#64748B' }}>Frontend: React 19 + Vite</span>
-            <span>•</span>
-            <span style={{ color: '#64748B' }}>Backend Ready: Node.js & Express</span>
-          </div>
+          <p>© {currentYear} Diabetes Risk Predictor. All rights reserved.</p>
         </div>
       </div>
     </footer>
