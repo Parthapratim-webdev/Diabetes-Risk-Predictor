@@ -1,0 +1,24 @@
+{
+  "users": [
+    {
+      "id": "usr_guest_demo",
+      "_id": "usr_guest_demo",
+      "name": "Alex Morgan",
+      "email": "alex.morgan@healthportal.demo",
+      "password": "",
+      "role": "User",
+      "createdAt": "2026-01-15T09:30:00Z",
+      "avatarInitials": "AM",
+      "notifications": {
+        "emailReports": true,
+        "healthTips": true,
+        "reminders": false
+      },
+      "privacySettings": {
+        "shareTelemetry": false,
+        "demoModeActive": true
+      }
+    }
+  ],
+  "assessments": []
+}
